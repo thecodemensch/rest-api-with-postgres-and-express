@@ -8,4 +8,4 @@ create database todos;
 -- CREATE TABLE
 
 drop table if exists todo;
-create table todo(id serial primary key, description varchar(255));
+create table todo(todo_id serial primary key, description varchar(255) not null);
