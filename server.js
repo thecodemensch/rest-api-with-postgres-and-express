@@ -1,5 +1,6 @@
 const express = require("express");
 const { pool } = require("./db");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -9,8 +10,10 @@ const port = 3333;
 
 // ROUTES
 
+const verify = require("./routes/verifyToken");
+
 // get all todos
-app.get("/todos", async (req, res) => {
+app.get("/todos", verify, async (req, res) => {
   try {
     const allTodos = await pool.query("select * from todo");
     res.json(allTodos.rows);
@@ -43,7 +46,11 @@ app.post("/todos", async (req, res) => {
       "INSERT INTO todo(description) VALUES($1) returning *",
       [description]
     );
-    res.json(newTodo);
+    // creating a jwt
+    const token = jwt.sign({ _id: newTodo._id }, process.env.TOKEN_SECRET);
+    res.header("auth-token", token).send(token);
+
+    //    res.json(newTodo);
   } catch (err) {
     console.log(err.message);
   }
